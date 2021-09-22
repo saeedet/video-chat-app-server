@@ -30,15 +30,22 @@ io.on("connection", (socket) => {
   socket.emit("socketid", socket.id);
 
   // Register a handler for "calluser" event
-  socket.on("calluser", ({ userToCall, signalData, from, name }) => {
+  socket.on("calluser", ({ userToCall, signalData, callerId, callerName }) => {
     // initialize the connection and send the caller info with an emit event
-    io.to(userToCall).emit("usercalling", { signal: signalData, from, name });
+    io.to(userToCall).emit("usercalling", {
+      signal: signalData,
+      callerId,
+      callerName,
+    });
   });
 
   // Register a handler for "answercall" event
   socket.on("answercall", (data) => {
     // initialize the connection and send the connection data with an emit event
-    io.to(data.to).emit("callaccepted", data.signal);
+    io.to(data.callerId).emit("callaccepted", {
+      signal: data.signal,
+      peer2Name: data.name,
+    });
   });
 
   // Register a handler for "disconnect" event
